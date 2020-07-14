@@ -7,11 +7,20 @@ import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
 
 import cookieParser from 'cookie-parser'
+import mongooseServices from './services/mongoose'
 import config from './config'
 import Html from '../client/html'
+import User from './model/user.model'
 
 const Root = () => ''
 
+mongooseServices.connect()
+
+const user = new User({
+  email: 'test@gmail.com',
+  password: '123'
+})
+user.save()
 try {
   // eslint-disable-next-line import/no-unresolved
   // ;(async () => {
@@ -40,6 +49,11 @@ const middleware = [
 ]
 
 middleware.forEach((it) => server.use(it))
+
+server.post('/api/v1/auth', (req, res) => {
+  console.log(req.body)
+  res.json({ status: 'ok' })
+})
 
 server.use('/api/', (req, res) => {
   res.status(404)
